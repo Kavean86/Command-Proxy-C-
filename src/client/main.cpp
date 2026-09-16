@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <thread>
 #include "client.h"
-#include "server.h"
+
 using namespace std;
 
 int main(int argc,char* argv[]){
@@ -16,5 +16,5 @@ return 1;
 string ip=argv[1];
 
 cout<<"Connect to server...\n";
-user_connect(ip);
+connect_client(ip);
 }

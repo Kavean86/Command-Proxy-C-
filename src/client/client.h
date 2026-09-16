@@ -1,7 +1,7 @@
 #pragma once
 using namespace std;
 
-void user_connect(string ip_target){
+void connect_client(string ip_target){
 
 int connect_socket=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
 
@@ -29,4 +29,6 @@ return;
 if(connecting==0){
 cout<<"connect to server <"<<ip_target<<">\n";
 }
+string mes="hello VPS";
+send(connect_socket,mes.c_str(),mes.size(),0);
 }
