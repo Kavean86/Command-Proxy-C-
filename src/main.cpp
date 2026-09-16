@@ -3,6 +3,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <thread>
+#include "client.h"
 #include "server.h"
 using namespace std;
 
