@@ -5,6 +5,7 @@
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
+#include <thread>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
@@ -18,12 +19,7 @@ bool send_all(int socket, const char* data, size_t len)
 
     while (sent < len)
     {
-        ssize_t bytes = send(
-            socket,
-            data + sent,
-            len - sent,
-            0
-        );
+        ssize_t bytes = send(socket, data + sent, len - sent, 0);
 
         if (bytes <= 0)
             return false;
@@ -41,12 +37,7 @@ void handle_client(int client)
 
     while (true)
     {
-        int bytes = recv(
-            client,
-            buffer,
-            sizeof(buffer) - 1,
-            0
-        );
+        int bytes = recv(client, buffer, sizeof(buffer) - 1, 0);
 
         if (bytes <= 0)
             break;
@@ -66,48 +57,26 @@ void handle_client(int client)
             {
                 const char* error = "cd: cannot change directory\n";
 
-                send_all(
-                    client,
-                    error,
-                    strlen(error)
-                );
+                send_all(client, error, strlen(error));
             }
         }
         else
         {
-            
             string full_command = command + " 2>&1";
-
-            FILE* pipe = popen(
-                full_command.c_str(),
-                "r"
-            );
+            FILE* pipe = popen(full_command.c_str(), "r");
 
             if (!pipe)
             {
                 const char* error = "popen: failed\n";
-
-                send_all(
-                    client,
-                    error,
-                    strlen(error)
-                );
+                send_all(client, error, strlen(error));
             }
             else
             {
-                while (fgets(
-                    buffer,
-                    sizeof(buffer),
-                    pipe
-                ))
+                while (fgets(buffer, sizeof(buffer), pipe))
                 {
                     size_t len = strlen(buffer);
 
-                    if (!send_all(
-                        client,
-                        buffer,
-                        len
-                    ))
+                    if (!send_all(client, buffer, len))
                     {
                         pclose(pipe);
                         close(client);
@@ -122,11 +91,7 @@ void handle_client(int client)
 
         const char* END = "<END>";
 
-        if (!send_all(
-            client,
-            END,
-            strlen(END)
-        ))
+        if (!send_all(client, END, strlen(END)))
         {
             break;
         }
@@ -163,17 +128,12 @@ void start_server(int port)
 
 
     sockaddr_in server_addr{};
-
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = INADDR_ANY;
     server_addr.sin_port = htons(port);
 
 
-    if (bind(
-        server_socket,
-        (sockaddr*)&server_addr,
-        sizeof(server_addr)
-    ) < 0)
+    if (bind(server_socket, (sockaddr*)&server_addr, sizeof(server_addr)) < 0)
     {
         perror("bind");
         close(server_socket);
@@ -188,22 +148,13 @@ void start_server(int port)
         return;
     }
 
-/*
-    cout << "Server listening on port "
-         << port
-         << "...\n";
-*/
 
     while (true)
     {
         sockaddr_in client_addr{};
         socklen_t client_len = sizeof(client_addr);
 
-        int client = accept(
-            server_socket,
-            (sockaddr*)&client_addr,
-            &client_len
-        );
+        int client = accept(server_socket,(sockaddr*)&client_addr,&client_len);
 
         if (client < 0)
         {
@@ -211,14 +162,7 @@ void start_server(int port)
             continue;
         }
 
-
-  //      cout << "Client connected.\n";
-
-
-        handle_client(client);
-
-
-    //    cout << "Client disconnected.\n";
+        thread(handle_client, client).detach();
     }
 
 
