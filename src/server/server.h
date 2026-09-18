@@ -5,7 +5,6 @@
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
-
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
@@ -56,15 +55,9 @@ void handle_client(int client)
 
         string command(buffer);
 
-        // خروج
         if (command == "EXIT")
             break;
 
-
-        /*
-         * cd باید در خود server اجرا شود
-         * تا directory تغییرکرده باقی بماند.
-         */
         if (command.rfind("cd ", 0) == 0)
         {
             string path = command.substr(3);
@@ -82,12 +75,7 @@ void handle_client(int client)
         }
         else
         {
-            /*
-             * 2>&1
-             *
-             * stderr را هم وارد stdout می‌کند
-             * تا خطاها هم از pipe خوانده شوند.
-             */
+            
             string full_command = command + " 2>&1";
 
             FILE* pipe = popen(
@@ -132,9 +120,6 @@ void handle_client(int client)
         }
 
 
-        /*
-         * اعلام پایان خروجی command
-         */
         const char* END = "<END>";
 
         if (!send_all(
@@ -151,9 +136,6 @@ void handle_client(int client)
 }
 
 
-/*
- * ساخت و اجرای کامل server
- */
 void start_server(int port)
 {
     int server_socket = socket(
@@ -206,11 +188,11 @@ void start_server(int port)
         return;
     }
 
-
+/*
     cout << "Server listening on port "
          << port
          << "...\n";
-
+*/
 
     while (true)
     {
@@ -230,13 +212,13 @@ void start_server(int port)
         }
 
 
-        cout << "Client connected.\n";
+  //      cout << "Client connected.\n";
 
 
         handle_client(client);
 
 
-        cout << "Client disconnected.\n";
+    //    cout << "Client disconnected.\n";
     }
 
 

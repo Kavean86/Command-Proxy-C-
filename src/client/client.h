@@ -33,7 +33,9 @@ string send_mes;
 
 while (true)
 {
-    getline(cin, send_mes);
+	cout << "\033[33m";
+	getline(cin, send_mes);
+	cout << "\033[0m";
 
     send(
         connect_socket,
@@ -62,7 +64,6 @@ while (true)
 
         recv_mes.append(buffer, bytes);
 
-        // پیدا کردن علامت پایان
         size_t pos = recv_mes.find("<END>");
 
         if (pos != string::npos)
