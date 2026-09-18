@@ -7,6 +7,9 @@
 
 using namespace std;
 
+// Program entry point
 int main(){
-start_server(6286);
+
+    // Start the server on port 6286
+    start_server(6286);
 }
