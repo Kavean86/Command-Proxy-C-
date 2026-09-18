@@ -8,5 +8,5 @@
 using namespace std;
 
 int main(){
-connect_server();
+start_server(6286);
 }

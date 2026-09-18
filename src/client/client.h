@@ -29,6 +29,50 @@ return;
 if(connecting==0){
 cout<<"connect to server <"<<ip_target<<">\n";
 }
-string mes="hello VPS";
-send(connect_socket,mes.c_str(),mes.size(),0);
+string send_mes;
+
+while (true)
+{
+    getline(cin, send_mes);
+
+    send(
+        connect_socket,
+        send_mes.c_str(),
+        send_mes.size(),
+        0
+    );
+
+    if (send_mes == "EXIT")
+        break;
+
+    string recv_mes;
+    char buffer[1024];
+
+    while (true)
+    {
+        int bytes = recv(
+            connect_socket,
+            buffer,
+            sizeof(buffer),
+            0
+        );
+
+        if (bytes <= 0)
+            break;
+
+        recv_mes.append(buffer, bytes);
+
+        // پیدا کردن علامت پایان
+        size_t pos = recv_mes.find("<END>");
+
+        if (pos != string::npos)
+        {
+            recv_mes.erase(pos);
+            break;
+        }
+    }
+
+    cout << recv_mes;
+}
+
 }
